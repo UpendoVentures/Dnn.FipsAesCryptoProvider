@@ -1,0 +1,16 @@
+<style>
+	div.uv-install-wrapper h3, div.uv-install-wrapper h4, div.uv-install-wrapper p, div.uv-install-wrapper hr, div.uv-install-wrapper ul { margin-bottom: 0.5em; }
+	div.uv-install-wrapper ul { padding-left: 2em; }
+</style>
+<div class="uv-install-wrapper">
+	<h1>FIPS AES Cryptography Provider for DNN</h1>
+	<h2>An innovation for the DNN community, <a href="https://upendoventures.com/What/CMS/DNN" target="_blank">by Upendo Ventures</a></h2> 
+
+	<p>This DNN provider helps website owners to comply with FIPS 197 compliance standards.</p>
+
+	<p>Version 01.00.00</p>
+	<ul>
+		<li>First release.</li>
+		<li>Built on DNN Platform 09.07.00.</li>
+	</ul>
+</div>

@@ -1,3 +1,40 @@
+# FIPS AES Compliant Cryptograpy Provider for DNN  
+This project exists to help [DNN CMS](https://dnncommunity.org) website owners by helping them to be FIPS-compliant.  
+
+The default FIPS crytography provider in DNN is not actually FIPS-compliant, per [FIPS 197](https://csrc.nist.gov/publications/detail/fips/197/final).  The core FIPS provider is based on TripleDES and FIPS requires AES.  However, simply changing the provider will not be enough.  
+
+While you may be able to just use this provider and not look back, our long-term plan is to perhaps contribute this back to the core of DNN later, after there's been enough vetting by ourselves, our clients, and the overall DNN community.  
+
+## Before You Use  
+If you'd like to switch to using this provider, you'll need to do the following:  
+
+1. Audit your website to determine how much you are already using the cryptography features in DNN.  
+2. Determine a path forward for any values that are already being encypted/decrypted. This should involve decrypting them using the current provider, then encrypting the value again using this one.  
+3. Once all encrypted values are using the new encryption, switch the default provider as shown below.  
+
+That's it!  
+
+## Installing & Enabling  
+Please sure to first read and fully understand the steps above.  
+
+**WARNING:** If you're not careful, enabling this provider could break one or more features on your website. Please test your website thoroughly in an offline test/development environment first.  
+
+1. (Optional, kind of) Create a full back up of your website. (This is a good practice before installing any new extension.)  
+2. [Install this provider into DNN](https://www.youtube.com/watch?v=MgLaV0J_eLk&list=PLojRGd54eWTiK-0y8o5EBYVcCY2yzhTZk&index=4) like you would any other extension.  
+3. (Optional) Back up your web.config file.  
+4. Either directly (if you have access to it) or [using the Config Manager](https://www.youtube.com/watch?v=uxkuoBTQBpk&list=PLojRGd54eWTiK-0y8o5EBYVcCY2yzhTZk&index=15), open your web.config file to edit it.  
+5. Find the following line in the web.config:  `<cryptography defaultProvider="FipsCompilanceCryptographyProvider">`  __OR__ `<cryptography defaultProvider="CoreCryptographyProvider">`  
+6. Update that line of code to use the `FipsAesCompilanceCryptographyProvider` cryptography provider instead of the core provider as the default.  The resulting line should look like the one below.  
+
+```xml  
+<cryptography defaultProvider="FipsAesCompilanceCryptographyProvider">  
+```  
+
+### Troubleshooting  
+If you made any typos, restore your web.config and try again.  
+
+# Contributing Developers  
+
 **A Special Note to ALL Developers...**  
 Please do not begin any development until you first read through and understand all of the notes in the README below.  
 
@@ -7,8 +44,8 @@ The previous version was not adhering to known best practices and as a result, i
 ## Solution  
 The solution currently expects to be in the following environment, but you can update that to be any version you'd like, provided all extensions will be compatible:  
 
-- DNN:  09.04.04  
-- Hotcakes Commerce:  03.02.03  
+- DNN:  09.07.00  
+- Hotcakes Commerce:  03.06.00  
 - SQL:  2014+  
 
 You should build and develop in a development environment that's separate from the local environment where you'd be testing.  The examples below help to illustrate this...  
