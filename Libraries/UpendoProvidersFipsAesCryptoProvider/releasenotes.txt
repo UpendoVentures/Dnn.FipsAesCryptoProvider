@@ -8,6 +8,11 @@
 
 	<p>This DNN provider helps website owners to comply with FIPS 197 compliance standards.</p>
 
+	<p>Version 01.00.01</p>
+	<ul>
+		<li>Resolves a bug with encrypt/decrypt.</li>
+	</ul>
+
 	<p>Version 01.00.00</p>
 	<ul>
 		<li>First release.</li>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <dotnetnuke type="Package" version="6.0">
   <packages>
-    <package name="Upendo.Providers.FipsAesCryptoProvider" type="Library" version="01.00.00">
+    <package name="Upendo.Providers.FipsAesCryptoProvider" type="Library" version="01.00.01">
       <friendlyName>Upendo FIPS AES Crypto Provider Library</friendlyName>
       <description>
 		<![CDATA[<p>This library is a FIPS-compliant version of the provider already in DNN, which is not actually FIPS compliant since it uses the wrong crypto standard.</p>]]>
