@@ -39,6 +39,7 @@ namespace Upendo.Libraries.UpendoProvidersFipsAesCryptoProvider
 {
     using System;
     using System.IO;
+    using System.Linq;
     using System.Security.Cryptography;
     using System.Text;
 
@@ -61,6 +62,8 @@ namespace Upendo.Libraries.UpendoProvidersFipsAesCryptoProvider
         private const string p_SecureMessage = "(value hidden for security purposes)";
         private const string p_InvalidAttempt = "A decryption attempt was unsuccessful.";
         private const int AesKeySize = 16;
+        private const int ivBytes = 16; // bytes
+        private const int keyBytes = 24; // bytes
 
         /// <summary>
         ///     copy of legacy PortalSecurity.Encrypt method.
@@ -203,8 +206,8 @@ namespace Upendo.Libraries.UpendoProvidersFipsAesCryptoProvider
             using (var hashProvider = CryptographyUtils.CreateSHA512())
             {
                 byte[] taesKey = hashProvider.ComputeHash(utf8.GetBytes(passphrase));
-                byte[] trimmedBytes = new byte[24];
-                Buffer.BlockCopy(taesKey, 0, trimmedBytes, 0, 24);
+                byte[] trimmedBytes = new byte[keyBytes];
+                Buffer.BlockCopy(taesKey, 0, trimmedBytes, 0, keyBytes);
                 var aesAlgorithm = new AesCryptoServiceProvider
                 {
                     Key = trimmedBytes,
@@ -217,7 +220,11 @@ namespace Upendo.Libraries.UpendoProvidersFipsAesCryptoProvider
                 try
                 {
                     ICryptoTransform encryptor = aesAlgorithm.CreateEncryptor();
-                    results = encryptor.TransformFinalBlock(dataToEncrypt, 0, dataToEncrypt.Length);
+                    var encrypted = encryptor.TransformFinalBlock(dataToEncrypt, 0, dataToEncrypt.Length);
+                    // Add Key IV & trimmed Key into result
+                    results = aesAlgorithm.IV.Concat(trimmedBytes).ToArray();
+                    // Add encrypted value
+                    results = results.Concat(encrypted).ToArray();
                 }
                 finally
                 {
@@ -242,19 +249,26 @@ namespace Upendo.Libraries.UpendoProvidersFipsAesCryptoProvider
             byte[] results;
             var utf8 = new UTF8Encoding();
 
+            byte[] textBytesWithSaltAndIv = Convert.FromBase64String(message);
+            // Get the IV bytes by extracting the next 16 bytes from the supplied Text bytes.
+            byte[] ivStringBytes = textBytesWithSaltAndIv.Take(ivBytes).ToArray();
+            byte[] trimmedBytes = textBytesWithSaltAndIv.Skip(ivBytes).Take(keyBytes).ToArray();
+            // Get the Byte to Decrypt
+            byte[] dataToDecrypt = textBytesWithSaltAndIv.Skip(ivBytes + keyBytes).Take(textBytesWithSaltAndIv.Length - (ivBytes + keyBytes)).ToArray();
+
             using (var hashProvider = CryptographyUtils.CreateSHA512())
             {
-                byte[] taesKey = hashProvider.ComputeHash(utf8.GetBytes(passphrase));
-                byte[] trimmedBytes = new byte[24];
-                Buffer.BlockCopy(taesKey, 0, trimmedBytes, 0, 24);
+                //byte[] taesKey = hashProvider.ComputeHash(utf8.GetBytes(passphrase));
+                //byte[] trimmedBytes = new byte[24];
+                //Buffer.BlockCopy(taesKey, 0, trimmedBytes, 0, 24);
                 var aesAlgorithm = new AesCryptoServiceProvider
                 {
+                    IV = ivStringBytes,
                     Key = trimmedBytes,
                     Mode = CipherMode.CBC,
                     Padding = PaddingMode.PKCS7
                 };
 
-                byte[] dataToDecrypt = Convert.FromBase64String(message);
                 try
                 {
                     ICryptoTransform decryptor = aesAlgorithm.CreateDecryptor();
